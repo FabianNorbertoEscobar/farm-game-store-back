@@ -1,0 +1,15 @@
+{
+  "name": "preentrega",
+  "version": "1.0.0",
+  "description": "Herramienta CLI para gestión de productos con FakeStore API",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "start:raw": "node index.raw.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
