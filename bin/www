@@ -1,0 +1,76 @@
+#!/usr/bin/env node
+
+import debugModule from "debug";
+import http from "http";
+import app from "../app.js";
+import { env } from "../src/config/env.js";
+import { appLogger } from "../src/utils/logger.js";
+
+const debug = debugModule("farm-game-store-back:server");
+
+const port = normalizePort(env.port || "3000");
+app.set("port", port);
+
+const server = http.createServer(app);
+
+server.listen(port);
+server.on("error", onError);
+server.on("listening", onListening);
+
+function normalizePort(value) {
+  const parsedPort = parseInt(value, 10);
+
+  if (Number.isNaN(parsedPort)) {
+    return value;
+  }
+
+  if (parsedPort >= 0) {
+    return parsedPort;
+  }
+
+  return false;
+}
+
+function onError(error) {
+  if (error.syscall !== "listen") {
+    appLogger.error("Error no controlado del servidor HTTP", {
+      code: error.code,
+      message: error.message,
+      stack: error.stack,
+    });
+    throw error;
+  }
+
+  const bind = typeof port === "string" ? `Pipe ${port}` : `Port ${port}`;
+
+  switch (error.code) {
+    case "EACCES":
+      appLogger.error("Permisos insuficientes para iniciar servidor", { bind });
+      process.exit(1);
+      break;
+    case "EADDRINUSE":
+      appLogger.error("Puerto en uso", { bind });
+      process.exit(1);
+      break;
+    default:
+      appLogger.error("Error al iniciar servidor", {
+        bind,
+        code: error.code,
+        message: error.message,
+      });
+      throw error;
+  }
+}
+
+function onListening() {
+  const addr = server.address();
+  const bind = typeof addr === "string" ? `pipe ${addr}` : `port ${addr.port}`;
+  debug(`Listening on ${bind}`);
+  appLogger.info("Servidor HTTP iniciado", {
+    bind,
+    port: env.port,
+    baseUrl: `http://localhost:${env.port}`,
+    nodeEnv: process.env.NODE_ENV || "development",
+    pid: process.pid,
+  });
+}
