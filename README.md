@@ -4,21 +4,26 @@ Backend API REST para autenticacion y administracion de productos de una tienda 
 
 ## Caracteristicas
 
-- Login con JWT Bearer.
-- CRUD completo de productos.
-- Arquitectura por capas: rutas, controladores, servicios, modelos, middlewares y configuracion.
-- Firestore configurado con una coleccion de pruebas separada: `products-test`.
-- Swagger UI integrado para explorar y probar la API.
-- Manejo de errores HTTP para 400, 401, 403, 404 y 500.
+- **Autenticacion con JWT:** `POST /auth/login` valida las credenciales configuradas en el entorno y devuelve un token Bearer firmado, con rol `admin` y expiracion de dos horas.
+- **CRUD de productos protegido:** listar, consultar por ID, crear, reemplazar, actualizar parcialmente y eliminar productos. Todas las rutas de productos requieren un JWT valido.
+- **Validacion de datos:** exige titulo, categoria y precio al crear o reemplazar; valida precios como enteros mayores o iguales a cero, evita modificar el ID en actualizaciones y permite enviar solo los campos deseados con `PATCH`.
+- **Persistencia en Firestore:** la coleccion se configura mediante `FIREBASE_PRODUCTS_COLLECTION` y usa `products-test` como valor predeterminado para mantener los datos de prueba separados.
+- **Documentacion interactiva:** Swagger UI y especificacion OpenAPI 3.0.3 disponibles para consultar esquemas, ejemplos, autenticacion y respuestas de los endpoints.
+- **Healthcheck y errores consistentes:** `GET /health` permite comprobar disponibilidad; la API responde con errores HTTP diferenciados para solicitudes invalidas, autenticacion, recursos inexistentes y fallos internos.
+- **Logs para seguimiento de solicitudes:** cada request incluye un identificador (`x-request-id`) y registra metodo, ruta, estado, bytes, latencia y usuario autenticado; admite salida `pretty` o `json` y niveles configurables.
+- **Pruebas automatizadas:** suite con Vitest y Supertest para verificar rutas, autenticacion, respuestas y documentacion Swagger.
+- **Organizacion por capas:** separa rutas, controladores, servicios, modelos, middlewares, configuracion y documentacion para aislar las responsabilidades.
 
 ## Stack
 
-- Node.js
-- Express
-- Express Generator
-- Firebase Firestore
-- JSON Web Token
-- Swagger UI Express
+- **Runtime:** Node.js con modulos ES (`"type": "module"`).
+- **Servidor HTTP y API:** Express 4 para definir la aplicacion y sus rutas; Express Generator como base de la estructura inicial del servidor.
+- **Base de datos y Firebase:** SDK modular de Firebase (`firebase`), con Firestore para productos y Firebase Auth opcional para establecer la sesion configurada.
+- **Autenticacion:** `jsonwebtoken` para firmar y validar tokens JWT Bearer.
+- **Documentacion de API:** especificacion OpenAPI 3.0.3 propia y `swagger-ui-express` para servir Swagger UI.
+- **Middleware HTTP:** `cors`, `body-parser` y `cookie-parser` para solicitudes; `morgan` para logs HTTP con request ID y usuario.
+- **Configuracion:** `dotenv` para cargar variables desde `.env`.
+- **Pruebas:** Vitest como runner y Supertest para probar la API HTTP.
 
 ## Estructura principal
 
